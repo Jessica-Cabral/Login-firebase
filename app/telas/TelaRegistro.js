@@ -3,27 +3,53 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Botao from "../components/Botao";
 import Input from "../components/Input";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
-import TelaLogin from "./TelaLogin";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebaseConfig";
 
-export default function TelaRegistro() {
+export default function TelaRegistro({navigation}) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
   
+  
+  async function cadastrarUsuario() {
+
+    if(senha === confirmarSenha){
+      try {
+        await createUserWithEmailAndPassword(auth, email, senha);
+        alert("Usuario cadastrado com sucesso!");
+        navigation.navigate('TelaLogin')
+
+      } catch (error) {
+        alert("Erro ao Cadastrar usuario!");
+      }
+    } else {
+      alert("Senha diferente");
+    }
+
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Registro</Text>
-      <Input placeholder="Nome Completo"  />
-      <Input placeholder="Email"  />
+      <Input placeholder="Email" 
+      value={email}
+      onChangeText={setEmail}
+      />
       <Input
         placeholder="Senha"
         secureTextEntry
+        value={senha}
+        onChangeText={setSenha}
       />
       <Input
         placeholder="Confirmar Senha"
         secureTextEntry
+        value={confirmarSenha}
+        onChangeText={setConfirmarSenha}
 
       />
-      <Botao titulo="Criar Conta"  />
+      <Botao titulo="Criar Conta" onPress={cadastrarUsuario} />
       <TouchableOpacity onPress={() => navigation.navigate("TelaLogin")}>
         <Text style={styles.link}>Já tem conta? Faça login</Text>
       </TouchableOpacity>
