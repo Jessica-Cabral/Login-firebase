@@ -1,13 +1,16 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Botao from "../components/Botao";
 import Input from "../components/Input";
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { db } from "../../firebaseConfig";
+import { doc, setDoc, addDoc, collection } from "firebase/firestore"
 import { auth } from "../../firebaseConfig";
 
 export default function TelaRegistro({navigation}) {
+  const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
@@ -17,12 +20,27 @@ export default function TelaRegistro({navigation}) {
 
     if(senha === confirmarSenha){
       try {
+        // inserir usuario para autenticacao
         await createUserWithEmailAndPassword(auth, email, senha);
-        alert("Usuario cadastrado com sucesso!");
+
+        //inserir usuario no banco de dados id personalizado
+        // await setDoc(doc(db,'Usuario', email),
+        // {
+        //   nome: nome,
+        //   email: email,
+        // });
+
+         //inserir usuario no banco de dados automatico
+         await addDoc(collection(db,'Usuario'),
+         {
+           nome: nome,
+           email: email,
+         });
+        Alert.alert("Informação:","Usuario cadastrado com sucesso!");
         navigation.navigate('TelaLogin')
 
       } catch (error) {
-        alert("Erro ao Cadastrar usuario!");
+        Alert.alert("Atencao:","Erro ao Cadastrar usuario!");
       }
     } else {
       alert("Senha diferente");
@@ -32,6 +50,10 @@ export default function TelaRegistro({navigation}) {
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Registro</Text>
+      <Input placeholder="Email" 
+      value={nome}
+      onChangeText={setNome}
+      />
       <Input placeholder="Email" 
       value={email}
       onChangeText={setEmail}

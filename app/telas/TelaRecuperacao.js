@@ -7,7 +7,6 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 
 export default function TelaRecuperacao({navigation}) {
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
 
   async function recuperarSenha() {
     try {
